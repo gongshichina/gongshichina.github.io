@@ -151,6 +151,245 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-广义线性模型/广义线性模型" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/10/28/%E5%B9%BF%E4%B9%89%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/%E5%B9%BF%E4%B9%89%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/">广义线性模型/广义线性模型</a>
+    </h1>
+  
+
+        
+        <a href="/2019/10/28/%E5%B9%BF%E4%B9%89%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/%E5%B9%BF%E4%B9%89%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/" class="archive-article-date">
+  	<time datetime="2019-10-28T15:28:00.464Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-10-28</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>##广义线性模型<br>二分类问题的输出，二项分布，<br>多分类问题的输出，多项分布<br>回归问题的输出，高斯分布</p>
+<p>这些任务都可以表示为广义线性模型</p>
+<ol>
+<li>线性模型<br>$y=\frac{1}{\sqrt{2\pi\sigma^2}}e^{\frac{(z-\mu)^2}{\sigma^2}},z = \theta^Tx$</li>
+<li>二分类<br>$y_1 = \frac{e^{-z}}{1+e^{-z}},z=\theta^{T}x$</li>
+<li>多分类<br>$y_j=\frac{e^{z_j}}{\sum_ie^{z_i}}, z=\theta^Tx$</li>
+</ol>
+<p><strong>指数族</strong> 概率分布函数表达式：<br>![Alt text](./2019-10-24 20-31-29 的屏幕截图.png)<br>许多分布都是是指数族的，比如伯努利分布，多项分布，高斯分布，泊松分布（建模count个数），gamma和指数分布（建模连续，非负随机变量，比如时间间隔），beta和狄利克雷分布（概率分布）</p>
+<p>伯努利分布：<br>$\phi$参数<br>![Alt text](./2019-10-24 20-47-14 的屏幕截图.png)</p>
+<p>高斯分布：<br>$\mu$参数<br>![Alt text](./2019-10-24 20-48-08 的屏幕截图.png)</p>
+<p>多项式分布：<br>$\phi_1,\phi_2,…,\phi_{k-1}$共计k-1个参数<br>![Alt text](./2019-10-24 21-13-16 的屏幕截图.png)<br>![Alt text](./2019-10-24 21-13-38 的屏幕截图.png)<br>![Alt text](./2019-10-24 21-13-56 的屏幕截图.png)</p>
+<p>将二项分布和多项分布表达为指数族的形式，就能得到$\eta$与概率$\phi$的关系表达式(sigmoid和softmax)，其中$\eta$可以由线性回归模型建模</p>
+<hr>
+<p>广义线性模型</p>
+<p>假设随机变量$y$满足指数族概率分布，那么怎么根据x预测y的值，也就是说将y表示为x的函数呢？</p>
+<p>我们先做以下三个假设：</p>
+<ol>
+<li>$y, | ,x; \theta$ ~ 指数族($\eta$)</li>
+<li>给定x，我们的目标是预测T(y)的期望值，在大多数例子中，T(y)=y</li>
+<li>自然参数$\eta$和输入x是线性相关的$\eta=\theta^Tx$</li>
+</ol>
+<hr>
+<p>一般的深度学习模型</p>
+<p>现有的深度学习模型，可以看做是广义线性模型的进一步推广，在GLM中有$\eta=\theta^Tx$，我们将其推广到非线性模型$\eta=f(x)$。其中 $f$ 为深度网络模型</p>
+<hr>
+<p>最大似然估计</p>
+<p>学习的过程采用 <em>最大似然估计</em>，就是说认为数据${(x_i, y_i)}$是存在噪声的，对于回归任务中的连续量$y_i$，我们可以认为它符合高斯分布，模型做点估计（估计$\mu$）</p>
+<p>对于多分类任务，数据集为${(x_i, y_i)},其中y_i\in{0,1,2,…,k}$ ，<br>可以认为$y_i$符合多项分布（one-hot向量），模型预测类别分布（同样是多项分布），最大化正类别的概率。</p>
+<ol>
+<li>softmax的交叉熵损失，最大化负对数概率<br>$l_{loss}=-\log{p}$其中$p$为softmax概率</li>
+<li>线性回归的L2损失，最大化负高斯分布概率<br>$l_{loss}=-\log\frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(y-\hat{y})^2}{2\sigma^2}}=\frac{(y-\hat{y})^2}{2\sigma^2}+\frac{1}{2}\log{2\pi\sigma^2}$在$\sigma=1$的条件下，$l_{loss}=\frac{1}{2}{(y-\hat{y})^2}$</li>
+</ol>
+<p>我们在回归任务中假定$y_i$是高斯分布的随机变量（测量是不准确的），对于分类任务，我们隐含的假设了$y_i$是带有随机噪声的吗？显然并没有这样，我们直接使用了$y_i$标签，那我们认为$x_i$带有随机噪声吗？。。。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/10/28/%E5%B9%BF%E4%B9%89%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/%E5%B9%BF%E4%B9%89%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Edward介绍" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/10/28/Edward%E4%BB%8B%E7%BB%8D/">Edward介绍</a>
+    </h1>
+  
+
+        
+        <a href="/2019/10/28/Edward%E4%BB%8B%E7%BB%8D/" class="archive-article-date">
+  	<time datetime="2019-10-28T15:17:18.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-10-28</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Edward"><a href="#Edward" class="headerlink" title="Edward"></a>Edward</h3><p>Edward是一个用于概率建模，推断，和criticism的Python库。它是进行概率模型的快速实验和研究的平台，从小数据集上的经典的层次模型，到大数据集上复杂的深度概率模型。Edward融合了三个领域：贝叶斯统计和机器学习，深度学习，概率编程。</p>
+        
+          <a class="article-more-a" href="/2019/10/28/Edward%E4%BB%8B%E7%BB%8D/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/10/28/Edward%E4%BB%8B%E7%BB%8D/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-my-first-blog" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/10/28/my-first-blog/">my-first-blog</a>
+    </h1>
+  
+
+        
+        <a href="/2019/10/28/my-first-blog/" class="archive-article-date">
+  	<time datetime="2019-10-28T15:07:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-10-28</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="矩阵论"><a href="#矩阵论" class="headerlink" title="矩阵论"></a>矩阵论</h2><p>导言：这是我的《矩阵分析》课程的自学笔记，笔记不追求知识的全面性（因为我不是编另一本教材），更多的是一些关键的概念理解和定理，帮助我自己梳理，除此以外，还会纳入一些重要的习题。</p>
+<p><strong>第0章 复习及其他</strong></p>
+<p>理解三者的关系<br>纯量域 –&gt; 向量 –&gt; 向量空间</p>
+<p><strong>向量空间</strong>：域 $F$ 上的向量空间是一些对象（称为向量）的集合 $V$，它在加法运算和数乘运算下是封闭的。$R^n$ 和 $C^n$ 是基本的向量空间。<br>除此以外，多项式集合，以及区间$[a, b]\subset R$上的实值或复值连续函数，或任意函数的集合也是向量空间的例子。</p>
+        
+          <a class="article-more-a" href="/2019/10/28/my-first-blog/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">矩阵论</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/10/28/my-first-blog/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-post-title" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -379,6 +618,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">矩阵论</a>
+              </li>
             
             <div class="clearfix"></div>
           </ul>
